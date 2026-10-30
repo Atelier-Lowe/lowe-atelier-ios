@@ -45,8 +45,11 @@ export default function App() {
   };
 
   // Les liens vers d'autres sites (Gmail, Agenda, Drive…) s'ouvrent dans leur appli ou Safari
+  // (pas de new URL() : sa version iPhone renvoie un hôte vide et tout partait dans Safari)
   const external = (url) => {
-    try { return new URL(url).host !== APP_HOST && /^https?:/.test(url); } catch { return false; }
+    if (typeof url !== "string" || !/^https?:\/\//i.test(url)) return false;
+    const host = url.replace(/^https?:\/\//i, "").split(/[\/?#:]/)[0].toLowerCase();
+    return host !== APP_HOST;
   };
 
   if (failed) {
@@ -78,7 +81,7 @@ export default function App() {
         cacheEnabled
         onMessage={onMessage}
         onShouldStartLoadWithRequest={(req) => {
-          if (req.isTopFrame !== false && external(req.url)) { Linking.openURL(req.url); return false; }
+          if (req.navigationType === "click" && req.isTopFrame !== false && external(req.url)) { Linking.openURL(req.url); return false; }
           return true;
         }}
         onOpenWindow={(e) => Linking.openURL(e.nativeEvent.targetUrl)}
