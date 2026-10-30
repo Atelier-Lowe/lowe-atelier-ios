@@ -2,14 +2,29 @@
 // Affiche l'appli web (lowe-atelier.netlify.app) et ajoute le scan LiDAR (Apple RoomPlan).
 // Le plan coté est calculé dans l'appli web à partir du fichier du scan.
 import { useEffect, useRef, useState } from "react";
-import { View, Text, Pressable, Linking, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, Linking, StyleSheet, ActivityIndicator, Share } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { WebView } from "react-native-webview";
-import { File } from "expo-file-system";
+import { File, Paths } from "expo-file-system";
 import { ExpoRoomplan as RoomPlan } from "expo-roomplan";
 
 const APP_URL = "https://lowe-atelier.netlify.app/";
 const APP_HOST = "lowe-atelier.netlify.app";
+
+// base64 -> octets (sans dépendance)
+const B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+function b64ToBytes(b64) {
+  const clean = b64.replace(/[^A-Za-z0-9+/]/g, "");
+  const out = new Uint8Array(Math.floor((clean.length * 3) / 4));
+  let o = 0;
+  for (let i = 0; i < clean.length; i += 4) {
+    const n = (B64.indexOf(clean[i]) << 18) | (B64.indexOf(clean[i + 1]) << 12) | ((B64.indexOf(clean[i + 2]) & 63) << 6) | (B64.indexOf(clean[i + 3]) & 63);
+    out[o++] = (n >> 16) & 255;
+    if (clean[i + 2] !== undefined) out[o++] = (n >> 8) & 255;
+    if (clean[i + 3] !== undefined) out[o++] = n & 255;
+  }
+  return out.slice(0, o);
+}
 
 export default function App() {
   const web = useRef(null);
@@ -38,6 +53,20 @@ export default function App() {
   const onMessage = (e) => {
     let msg = {};
     try { msg = JSON.parse(e.nativeEvent.data); } catch {}
+    if (msg.type === "file" && msg.b64) {
+      // Fichier envoyé par l'appli web (plan SketchUp, image…) : on l'enregistre puis on ouvre le menu Partager
+      try {
+        const name = String(msg.name || "fichier").replace(/[\\/:*?"<>|]+/g, "-");
+        const f = new File(Paths.cache, name);
+        if (f.exists) f.delete();
+        f.create();
+        f.write(b64ToBytes(msg.b64));
+        Share.share({ url: f.uri }).catch(() => {});
+      } catch (err) {
+        web.current?.injectJavaScript(`window.toast && toast("Le fichier n'a pas pu être partagé.");true;`);
+      }
+      return;
+    }
     if (msg.type === "scan") {
       setBusy(true);
       RoomPlan.startCapture(msg.name || "piece", "PARAMETRIC", true).catch(() => setBusy(false));
