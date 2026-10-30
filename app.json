@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "Löwe Atelier",
+    "slug": "lowe-atelier",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#F5F1E8"
+    },
+    "ios": {
+      "bundleIdentifier": "fr.atelierlowe.atelier",
+      "buildNumber": "1",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "L'appareil photo sert à photographier, filmer et scanner les pièces de vos chantiers.",
+        "NSPhotoLibraryUsageDescription": "L'accès aux photos permet d'importer les photos et plans de vos chantiers.",
+        "NSPhotoLibraryAddUsageDescription": "Permet d'enregistrer les rendus et plans dans vos photos.",
+        "NSMicrophoneUsageDescription": "Le micro sert à enregistrer le son des vidéos de chantier.",
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIRequiredDeviceCapabilities": [
+          "arkit"
+        ]
+      }
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "17.0"
+          }
+        }
+      ],
+      "expo-roomplan"
+    ]
+  }
+}
