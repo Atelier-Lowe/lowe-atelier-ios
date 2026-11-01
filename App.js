@@ -58,6 +58,11 @@ export default function App() {
   const onMessage = (e) => {
     let msg = {};
     try { msg = JSON.parse(e.nativeEvent.data); } catch {}
+    if (msg.type === "open" && typeof msg.url === "string" && /^(https?:|tel:|sms:|mailto:)/i.test(msg.url)) {
+      // Fiche client : Google Maps, appel, SMS, WhatsApp, mail
+      Linking.openURL(msg.url).catch(() => {});
+      return;
+    }
     if (msg.type === "file" && msg.b64) {
       // Fichier envoyé par l'appli web (plan SketchUp, image…) : on l'enregistre puis on ouvre le menu Partager
       try {
