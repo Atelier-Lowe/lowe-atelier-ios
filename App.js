@@ -7,6 +7,8 @@ import { StatusBar } from "expo-status-bar";
 import { WebView } from "react-native-webview";
 import { File, Paths } from "expo-file-system";
 import { ExpoRoomplan as RoomPlan } from "expo-roomplan";
+import * as Print from "expo-print";
+import { activateKeepAwakeAsync } from "expo-keep-awake";
 
 const APP_URL = "https://lowe-atelier.netlify.app/";
 const APP_HOST = "lowe-atelier.netlify.app";
@@ -30,6 +32,9 @@ export default function App() {
   const web = useRef(null);
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState(false);
+
+  // L'écran ne se met pas en veille tant que l'appli est ouverte
+  useEffect(() => { activateKeepAwakeAsync("lowe").catch(() => {}); }, []);
 
   // Résultat du scan : on lit le fichier JSON et on l'envoie à l'appli web
   useEffect(() => {
@@ -65,6 +70,25 @@ export default function App() {
       } catch (err) {
         web.current?.injectJavaScript(`window.toast && toast("Le fichier n'a pas pu être partagé.");true;`);
       }
+      return;
+    }
+    if (msg.type === "pdf" && msg.html) {
+      // Dossier / plan : vrai PDF A4 puis menu Partager (Mail, WhatsApp, Imprimer, Fichiers…)
+      (async () => {
+        try {
+          const { uri } = await Print.printToFileAsync({ html: msg.html, width: 595, height: 842 });
+          let url = uri;
+          try {
+            const name = String(msg.name || "dossier.pdf").replace(/[\\/:*?"<>|]+/g, "-");
+            const src = new File(uri), dst = new File(Paths.cache, name);
+            if (dst.exists) dst.delete();
+            src.copy(dst); url = dst.uri;
+          } catch (e) {}
+          await Share.share({ url });
+        } catch (err) {
+          web.current?.injectJavaScript(`window.toast && toast("Le PDF n'a pas pu être créé.");true;`);
+        }
+      })();
       return;
     }
     if (msg.type === "scan") {
