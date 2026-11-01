@@ -10,8 +10,9 @@ import { ExpoRoomplan as RoomPlan } from "expo-roomplan";
 import * as Print from "expo-print";
 import { activateKeepAwakeAsync } from "expo-keep-awake";
 
-const APP_URL = "https://lowe-atelier.netlify.app/";
-const APP_HOST = "lowe-atelier.netlify.app";
+const APP_URL = "https://atelier-lowe.github.io/";
+// l'ancienne adresse reste dans l'appli (pour récupérer les anciens chantiers)
+const APP_HOSTS = ["atelier-lowe.github.io", "lowe-atelier.netlify.app"];
 
 // base64 -> octets (sans dépendance)
 const B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -107,7 +108,7 @@ export default function App() {
   const external = (url) => {
     if (typeof url !== "string" || !/^https?:\/\//i.test(url)) return false;
     const host = url.replace(/^https?:\/\//i, "").split(/[\/?#:]/)[0].toLowerCase();
-    return host !== APP_HOST;
+    return !APP_HOSTS.includes(host);
   };
 
   if (failed) {
