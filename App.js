@@ -10,8 +10,8 @@ import { ExpoRoomplan as RoomPlan } from "expo-roomplan";
 import * as Print from "expo-print";
 import { activateKeepAwakeAsync } from "expo-keep-awake";
 
-const APP_URL = "https://atelier-lowe.github.io/";
-// l'ancienne adresse reste dans l'appli (pour récupérer les anciens chantiers)
+const APP_URL = "https://lowe-atelier.netlify.app/";
+// adresse de secours (GitHub) gardée dans l'appli
 const APP_HOSTS = ["atelier-lowe.github.io", "lowe-atelier.netlify.app"];
 
 // base64 -> octets (sans dépendance)
