@@ -6,7 +6,7 @@ import { View, Text, Pressable, Linking, StyleSheet, ActivityIndicator, Share } 
 import { StatusBar } from "expo-status-bar";
 import { WebView } from "react-native-webview";
 import { File, Paths } from "expo-file-system";
-import { ExpoRoomplan as RoomPlan } from "expo-roomplan";
+import RoomPlan from "./modules/lowe-roomplan"; // scan RoomPlan + photos prises pendant le scan
 import * as Print from "expo-print";
 import { activateKeepAwakeAsync } from "expo-keep-awake";
 
@@ -45,6 +45,23 @@ export default function App() {
       if (ev?.status === "OK" && ev.jsonUrl) {
         try {
           const text = await new File(ev.jsonUrl).text();
+          // photos prises pendant le scan : envoyées une par une avant le plan
+          if (ev.photosUrl) {
+            try {
+              const meta = JSON.parse(await new File(ev.photosUrl).text());
+              const list = (meta && meta.photos) || [];
+              send(`window.__onScanPhotosStart && window.__onScanPhotosStart(${list.length})`);
+              for (let i = 0; i < list.length; i++) {
+                const p = list[i];
+                try {
+                  const b64 = await new File(p.file).base64();
+                  const { file, ...info } = p;
+                  send(`window.__onScanPhoto && window.__onScanPhoto(${JSON.stringify({ i, n: list.length, info, b64 })})`);
+                  await new Promise((r) => setTimeout(r, 30));
+                } catch (e) {}
+              }
+            } catch (e) {}
+          }
           send(`window.__onScan && window.__onScan(${JSON.stringify(text)})`);
         } catch (e) {
           send(`window.__onScanStatus && window.__onScanStatus("Error")`);
