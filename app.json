@@ -34,8 +34,7 @@
             "deploymentTarget": "17.0"
           }
         }
-      ],
-      "expo-roomplan"
+      ]
     ]
   }
 }
