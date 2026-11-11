@@ -41,6 +41,9 @@
       "eas": {
         "projectId": "5dd46f50-e0ef-4f1b-b900-788e7718c841"
       }
+    },
+    "locales": {
+      "fr": "./locales/fr.json"
     }
   }
 }
