@@ -4,7 +4,8 @@
   ],
   "ios": {
     "modules": [
-      "LoweRoomPlanModule"
+      "LoweRoomPlanModule",
+      "LoweDistoModule"
     ]
   }
 }
