@@ -8,6 +8,9 @@ import { WebView } from "react-native-webview";
 import { File, Paths } from "expo-file-system";
 import RoomPlan from "./modules/lowe-roomplan"; // scan RoomPlan + photos prises pendant le scan
 import * as Print from "expo-print";
+import { requireNativeModule } from "expo-modules-core";
+// télémètre Leica DISTO en Bluetooth (module natif dans modules/lowe-roomplan/ios/LoweDisto.swift)
+const Disto = requireNativeModule("LoweDisto");
 import { activateKeepAwakeAsync } from "expo-keep-awake";
 
 const APP_URL = "https://lowe-atelier.netlify.app/";
@@ -36,6 +39,14 @@ export default function App() {
 
   // L'écran ne se met pas en veille tant que l'appli est ouverte
   useEffect(() => { activateKeepAwakeAsync("lowe").catch(() => {}); }, []);
+
+  // Télémètre Leica DISTO : état de la liaison et mesures envoyés à l'appli web
+  useEffect(() => {
+    const send = (o) => web.current?.injectJavaScript(`window.__onDisto && window.__onDisto(${JSON.stringify(o)});true;`);
+    const a = Disto.addListener("onDistoStatus", (ev) => send({ kind: "status", ...ev }));
+    const b = Disto.addListener("onDistoMeasure", (ev) => send({ kind: "measure", ...ev }));
+    return () => { a?.remove(); b?.remove(); };
+  }, []);
 
   // Résultat du scan : on lit le fichier JSON et on l'envoie à l'appli web
   useEffect(() => {
@@ -112,6 +123,17 @@ export default function App() {
           web.current?.injectJavaScript(`window.toast && toast("Le PDF n'a pas pu être créé.");true;`);
         }
       })();
+      return;
+    }
+    if (msg.type === "disto") {
+      try {
+        if (msg.action === "connect") Disto.connect();
+        else if (msg.action === "disconnect") Disto.disconnect();
+        else if (msg.action === "forget") Disto.forget();
+        else if (msg.action === "command" && /^[a-z]{1,3}$/.test(msg.cmd || "")) Disto.command(msg.cmd);
+      } catch (err) {
+        web.current?.injectJavaScript(`window.__onDisto && window.__onDisto({kind:"status",status:"error",message:"Mettez à jour l'appli (TestFlight) pour utiliser le laser."});true;`);
+      }
       return;
     }
     if (msg.type === "scan") {
