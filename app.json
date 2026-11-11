@@ -23,7 +23,8 @@
         "CFBundleLocalizations": [
           "fr"
         ],
-        "CFBundleAllowMixedLocalizations": true
+        "CFBundleAllowMixedLocalizations": true,
+        "NSBluetoothAlwaysUsageDescription": "Le Bluetooth sert à recevoir les mesures de votre télémètre laser Leica DISTO."
       }
     },
     "plugins": [
