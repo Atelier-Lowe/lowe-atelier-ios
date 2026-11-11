@@ -369,7 +369,7 @@ class LoweCaptureViewController: UIViewController, RoomCaptureViewDelegate,
                     print("[RoomPlan] Timed out waiting for room data to finish processing.")
                     self.sendScanResultAndDismiss(
                         status: .Error,
-                        errorMessage: "Timed out waiting for the scan to finish processing."
+                        errorMessage: "Le scan met trop de temps à se terminer. Réessayez."
                     )
                 }
             } else {
@@ -426,7 +426,7 @@ class LoweCaptureViewController: UIViewController, RoomCaptureViewDelegate,
                             domain: "ExpoRoomPlan",
                             code: 2,
                             userInfo: [
-                                NSLocalizedDescriptionKey: "No rooms were successfully captured. Try scanning again, covering more of the walls and floor before finishing."
+                                NSLocalizedDescriptionKey: "Aucune pièce n'a été captée. Recommencez en balayant davantage les murs et le sol avant de terminer."
                             ]
                         )
                     }
@@ -448,7 +448,7 @@ class LoweCaptureViewController: UIViewController, RoomCaptureViewDelegate,
                             domain: "ExpoRoomPlan",
                             code: 1,
                             userInfo: [
-                                NSLocalizedDescriptionKey: "No captured room available to export."
+                                NSLocalizedDescriptionKey: "Aucun scan à enregistrer."
                             ]
                         )
                     }
