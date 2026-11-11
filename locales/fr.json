@@ -1,0 +1,7 @@
+{
+  "CFBundleDisplayName": "Löwe Atelier",
+  "NSCameraUsageDescription": "L'appareil photo sert à photographier, filmer et scanner les pièces de vos chantiers.",
+  "NSPhotoLibraryUsageDescription": "L'accès aux photos permet d'importer les photos et plans de vos chantiers.",
+  "NSPhotoLibraryAddUsageDescription": "Permet d'enregistrer les rendus et plans dans vos photos.",
+  "NSMicrophoneUsageDescription": "Le micro sert à enregistrer le son des vidéos de chantier."
+}
