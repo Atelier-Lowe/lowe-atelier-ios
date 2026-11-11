@@ -12,6 +12,6 @@ Pod::Spec.new do |s|
   s.static_framework = true
   s.dependency 'ExpoModulesCore'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
-  s.frameworks = 'RoomPlan', 'RealityKit', 'ARKit', 'CoreImage'
+  s.frameworks = 'RoomPlan', 'RealityKit', 'ARKit', 'CoreImage', 'CoreBluetooth'
   s.source_files = "**/*.{h,m,mm,swift}"
 end
